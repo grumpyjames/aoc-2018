@@ -18,4 +18,18 @@ path = "src/seven.rs"
 name = "eight"
 path = "src/eight.rs"
 
+[[bin]]
+name = "nine"
+path = "src/nine.rs"
 
+[[bin]]
+name = "nine-alt"
+path = "src/nine-alt.rs"
+
+[[bin]]
+name = "ten"
+path = "src/ten.rs"
+
+[[bin]]
+name = "eleven"
+path = "src/eleven.rs"
