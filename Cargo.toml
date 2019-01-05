@@ -14,4 +14,8 @@ path = "src/six.rs"
 name = "seven"
 path = "src/seven.rs"
 
+[[bin]]
+name = "eight"
+path = "src/eight.rs"
+
 
