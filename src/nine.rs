@@ -11,12 +11,7 @@ struct Entry
     value: usize,
     prev: usize,
     next: usize,
-//    idx: usize
 }
-//
-//fn get(storage: &mut Vec<Entry>, idx: usize) -> &mut Entry {
-//    storage.get_mut(idx).unwrap()
-//}
 
 fn main() {
     let player_count = 448;
