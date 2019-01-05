@@ -1,0 +1,17 @@
+[package]
+name = "aoc"
+version = "0.1.0"
+authors = ["James Byatt <grumpyjames@gmail.com>"]
+
+[dependencies]
+regex = "1"
+
+[[bin]]
+name = "six"
+path = "src/six.rs"
+
+[[bin]]
+name = "seven"
+path = "src/seven.rs"
+
+
