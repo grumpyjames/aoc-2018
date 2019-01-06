@@ -5,6 +5,7 @@ use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::fmt::Formatter;
 use std::fmt::Error;
+use std::collections::HashSet;
 
 fn key_to_string(bs: &[bool; 5]) -> String {
     let mut res = String::new();
@@ -207,7 +208,6 @@ fn main() {
 //    evolute.insert(to_bit_array(".#.#."), false);
 //    evolute.insert(to_bit_array("...#."), false);
 
-
     let mut state = to_bit_state(&initial_state);
     let mut new_front = VecDeque::new();
     let mut new_back = VecDeque::new();
@@ -217,6 +217,7 @@ fn main() {
         read_index: 0
     };
     let mut key = [false, false, false, false, false];
+    let mut seen = HashSet::new();
 
     /*
     0
@@ -224,10 +225,12 @@ fn main() {
 ..#...#....#.....#..#..#..#..
 
     */
-
-    for _h in 0..20 {
+    print(&mut state);
+    let mut zeroth_pot_index : i32 = 0;
+    for h in 0..20 {
         window.reset();
         let mut new_front_pot = false;
+        let mut new_back_pots = 0;
 
         for i in 0..state.len() + 4 {
             let pot_index = (i as i32) - 2;
@@ -239,6 +242,7 @@ fn main() {
 
             window.copy_to(&mut key);
             let new_val = *evolute.get(&key).unwrap_or(&false);
+            //println!("{} {} {} {}", key_to_string(&key), new_val, i, pot_index);
 
             if pot_index < 0 {
                 if new_front_pot || new_val {
@@ -249,6 +253,9 @@ fn main() {
             else if pot_index >= state.len() as i32
             {
                 new_back.push_back(new_val);
+                if new_val {
+                    new_back_pots += 1;
+                }
             }
             else
             {
@@ -256,17 +263,51 @@ fn main() {
             }
         }
 
+        zeroth_pot_index -= new_front.len() as i32;
         while !new_front.is_empty() {
             state.push_front(new_front.pop_back().unwrap());
         }
-        while !new_back.is_empty() {
-            state.push_back(new_back.pop_back().unwrap());
+        //print(&new_back);
+
+        while new_back_pots != 0 {
+            let plant = new_back.pop_front().unwrap();
+            state.push_back(plant);
+            if plant {
+                new_back_pots -= 1;
+            }
         }
+        new_back.clear();
+
+        while !state[0] {
+            state.pop_front();
+            zeroth_pot_index += 1;
+        }
+
         print(&mut state);
+        if !seen.insert(state_to_string(&state)) {
+            println!("period found at iter {}! {}", h, state_to_string(&state));
+            break;
+        }
     }
+
+    let mut counting_index = zeroth_pot_index;
+    let mut total = 0;
+    for i in 0..state.len() {
+        if state[i] {
+            total += counting_index;
+        }
+        counting_index += 1
+    }
+
+    println!("{}", total);
 }
 
-fn print(state: &mut VecDeque<bool>) {
+fn print(state: &VecDeque<bool>) {
+    let res = state_to_string(state);
+    println!("{}", res);
+}
+
+fn state_to_string(state: &VecDeque<bool>) -> String {
     let mut res = String::new();
     state.iter().for_each(|b| {
         if *b {
@@ -275,5 +316,5 @@ fn print(state: &mut VecDeque<bool>) {
             res += ".";
         }
     });
-    println!("{}", res);
+    res
 }
