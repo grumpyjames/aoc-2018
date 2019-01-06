@@ -5,7 +5,6 @@ use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::fmt::Formatter;
 use std::fmt::Error;
-use std::collections::HashSet;
 
 fn key_to_string(bs: &[bool; 5]) -> String {
     let mut res = String::new();
@@ -155,58 +154,58 @@ mod tests {
 
 fn main() {
     let initial_state =
-        String::from(/* ..... */"#..#.#..##......###...###" /* ..... */);
-        //String::from("######....##.###.#..#####...#.#.....#..#.#.##......###.#..##..#..##..#.##..#####.#.......#.....##..");
+        //String::from(/* ..... */"#..#.#..##......###...###" /* ..... */);
+        String::from("######....##.###.#..#####...#.#.....#..#.#.##......###.#..##..#..##..#.##..#####.#.......#.....##..");
     let mut evolute = HashMap::new();
 
 
-    evolute.insert(to_bit_array("...##"), true);
-    evolute.insert(to_bit_array("..#.."), true);
-    evolute.insert(to_bit_array(".#..."), true);
-    evolute.insert(to_bit_array(".#.#."), true);
-    evolute.insert(to_bit_array(".#.##"), true);
-    evolute.insert(to_bit_array(".##.."), true);
-    evolute.insert(to_bit_array(".####"), true);
-    evolute.insert(to_bit_array("#.#.#"), true);
-    evolute.insert(to_bit_array("#.###"), true);
-    evolute.insert(to_bit_array("##.#."), true);
-    evolute.insert(to_bit_array("##.##"), true);
-    evolute.insert(to_bit_array("###.."), true);
-    evolute.insert(to_bit_array("###.#"), true);
-    evolute.insert(to_bit_array("####."), true);
-
 //    evolute.insert(to_bit_array("...##"), true);
-//    evolute.insert(to_bit_array("###.."), false);
-//    evolute.insert(to_bit_array("#.#.#"), false);
-//    evolute.insert(to_bit_array("#####"), false);
-//    evolute.insert(to_bit_array("....#"), false);
-//    evolute.insert(to_bit_array("##.##"), false);
-//    evolute.insert(to_bit_array("##.#."), true);
-//    evolute.insert(to_bit_array("##..."), true);
-//    evolute.insert(to_bit_array("#..#."), true);
-//    evolute.insert(to_bit_array("#.#.."), false);
-//    evolute.insert(to_bit_array("#.##."), false);
-//    evolute.insert(to_bit_array("....."), false);
-//    evolute.insert(to_bit_array("##..#"), false);
-//    evolute.insert(to_bit_array("#..##"), false);
-//    evolute.insert(to_bit_array(".##.#"), true);
-//    evolute.insert(to_bit_array("..###"), true);
-//    evolute.insert(to_bit_array("..#.#"), true);
-//    evolute.insert(to_bit_array(".####"), true);
-//    evolute.insert(to_bit_array(".##.."), false);
-//    evolute.insert(to_bit_array(".#..#"), true);
-//    evolute.insert(to_bit_array("..##."), false);
-//    evolute.insert(to_bit_array("#...."), false);
-//    evolute.insert(to_bit_array("#...#"), false);
-//    evolute.insert(to_bit_array(".###."), false);
-//    evolute.insert(to_bit_array("..#.."), false);
-//    evolute.insert(to_bit_array("####."), true);
-//    evolute.insert(to_bit_array(".#.##"), false);
-//    evolute.insert(to_bit_array("###.#"), false);
-//    evolute.insert(to_bit_array("#.###"), true);
+//    evolute.insert(to_bit_array("..#.."), true);
 //    evolute.insert(to_bit_array(".#..."), true);
-//    evolute.insert(to_bit_array(".#.#."), false);
-//    evolute.insert(to_bit_array("...#."), false);
+//    evolute.insert(to_bit_array(".#.#."), true);
+//    evolute.insert(to_bit_array(".#.##"), true);
+//    evolute.insert(to_bit_array(".##.."), true);
+//    evolute.insert(to_bit_array(".####"), true);
+//    evolute.insert(to_bit_array("#.#.#"), true);
+//    evolute.insert(to_bit_array("#.###"), true);
+//    evolute.insert(to_bit_array("##.#."), true);
+//    evolute.insert(to_bit_array("##.##"), true);
+//    evolute.insert(to_bit_array("###.."), true);
+//    evolute.insert(to_bit_array("###.#"), true);
+//    evolute.insert(to_bit_array("####."), true);
+
+    evolute.insert(to_bit_array("...##"), true);
+    evolute.insert(to_bit_array("###.."), false);
+    evolute.insert(to_bit_array("#.#.#"), false);
+    evolute.insert(to_bit_array("#####"), false);
+    evolute.insert(to_bit_array("....#"), false);
+    evolute.insert(to_bit_array("##.##"), false);
+    evolute.insert(to_bit_array("##.#."), true);
+    evolute.insert(to_bit_array("##..."), true);
+    evolute.insert(to_bit_array("#..#."), true);
+    evolute.insert(to_bit_array("#.#.."), false);
+    evolute.insert(to_bit_array("#.##."), false);
+    evolute.insert(to_bit_array("....."), false);
+    evolute.insert(to_bit_array("##..#"), false);
+    evolute.insert(to_bit_array("#..##"), false);
+    evolute.insert(to_bit_array(".##.#"), true);
+    evolute.insert(to_bit_array("..###"), true);
+    evolute.insert(to_bit_array("..#.#"), true);
+    evolute.insert(to_bit_array(".####"), true);
+    evolute.insert(to_bit_array(".##.."), false);
+    evolute.insert(to_bit_array(".#..#"), true);
+    evolute.insert(to_bit_array("..##."), false);
+    evolute.insert(to_bit_array("#...."), false);
+    evolute.insert(to_bit_array("#...#"), false);
+    evolute.insert(to_bit_array(".###."), false);
+    evolute.insert(to_bit_array("..#.."), false);
+    evolute.insert(to_bit_array("####."), true);
+    evolute.insert(to_bit_array(".#.##"), false);
+    evolute.insert(to_bit_array("###.#"), false);
+    evolute.insert(to_bit_array("#.###"), true);
+    evolute.insert(to_bit_array(".#..."), true);
+    evolute.insert(to_bit_array(".#.#."), false);
+    evolute.insert(to_bit_array("...#."), false);
 
     let mut state = to_bit_state(&initial_state);
     let mut new_front = VecDeque::new();
@@ -217,7 +216,6 @@ fn main() {
         read_index: 0
     };
     let mut key = [false, false, false, false, false];
-    let mut seen = HashSet::new();
 
     /*
     0
@@ -227,7 +225,7 @@ fn main() {
     */
     print(&mut state);
     let mut zeroth_pot_index : i32 = 0;
-    for h in 0..20 {
+    for h in 0..250 {
         window.reset();
         let mut new_front_pot = false;
         let mut new_back_pots = 0;
@@ -278,18 +276,17 @@ fn main() {
         }
         new_back.clear();
 
-        while !state[0] {
+        while !state[0] && zeroth_pot_index != 0 {
             state.pop_front();
             zeroth_pot_index += 1;
         }
 
         print(&mut state);
-        if !seen.insert(state_to_string(&state)) {
-            println!("period found at iter {}! {}", h, state_to_string(&state));
-            break;
-        }
+        print_total(&state, zeroth_pot_index, h);
     }
+}
 
+fn print_total(state: &VecDeque<bool>, zeroth_pot_index: i32, gen: usize) {
     let mut counting_index = zeroth_pot_index;
     let mut total = 0;
     for i in 0..state.len() {
@@ -298,8 +295,7 @@ fn main() {
         }
         counting_index += 1
     }
-
-    println!("{}", total);
+    println!("At generation {}, total was {}", gen + 1, total);
 }
 
 fn print(state: &VecDeque<bool>) {
