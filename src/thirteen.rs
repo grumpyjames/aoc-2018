@@ -3,6 +3,7 @@ extern crate regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 
 #[derive(Debug, Copy, Clone)]
@@ -213,56 +214,74 @@ fn main() {
             y += 1;
         });
 
-    //print_world(&track_rows, &carts);
+    let mut removed : HashSet<usize> = HashSet::new();
 
-    let mut crashed = false;
-    let mut tick = 1;
-    while !crashed {
-        let mut positions = HashMap::new();
-        carts.iter().for_each(|c| {
-            let v = positions.entry((c.x, c.y)).or_insert(0);
-            *v += 1;
-        });
-        carts.sort_by(|c1, c2| (c1.y, c1.x).cmp(&(c2.y, c2.x)));
+    while carts.len() - removed.len() > 1 {
+        tick(&track_rows, &mut carts, &mut removed);
+    }
+    tick(&track_rows, &mut carts, &mut removed);
+    print_world(&track_rows, &carts);
 
-        println!("Before Tick {}", tick);
-        carts.iter().for_each(|c| println!("{:?}", c.to_string(&track_rows)));
+    for c in carts {
+        if !removed.contains(&c.cart_id) {
+            println!("{:?}", c.to_string(&track_rows));
+        }
+    }
+}
 
-        carts
-            .iter_mut()
-            .for_each(|c| {
-                {
-                    let option = positions.get_mut(&(c.x, c.y));
-                    match option {
-                        None => {},
-                        Some(a) => { *a -= 1 },
-                    }
-                }
+fn tick(
+    track_rows: &Vec<Vec<Option<Track>>>,
+    carts: &mut Vec<Cart>,
+    removed: &mut HashSet<usize>) {
+
+    let mut positions = HashMap::new();
+    carts.iter().for_each(|c| {
+        positions
+            .entry((c.x, c.y))
+            .or_insert(HashSet::new())
+            .insert(c.cart_id);
+    });
+    carts.sort_by(|c1, c2| (c1.y, c1.x).cmp(&(c2.y, c2.x)));
+    carts
+        .iter_mut()
+        .for_each(|c| {
+            if !removed.contains(&c.cart_id) {
+                let mut crashed = false;
+
+                positions.get_mut(&(c.x, c.y)).unwrap().remove(&c.cart_id);
+
                 c.tick(&track_rows);
                 {
-                    let option = positions.get(&(c.x, c.y));
+                    let option =
+                        positions.get_mut(&(c.x, c.y));
                     match option
                         {
                             Some(a) => {
-                                if *a != 0 {
+                                if a.len() != 0 {
                                     println!("crash at {},{}", c.x, c.y);
-                                    println!("{:?}", positions);
                                     crashed = true;
+                                    a
+                                        .iter()
+                                        .for_each(|id| {
+                                            removed.insert(*id);
+                                        });
+                                    a.clear();
+                                    removed.insert(c.cart_id);
                                 }
                             },
                             _ => {}
                         }
                 }
+
                 if !crashed
                 {
-                    positions.insert((c.x, c.y), 1);
+                    positions
+                        .entry((c.x, c.y))
+                        .or_insert(HashSet::new())
+                        .insert(c.cart_id);
                 }
-            });
-        println!("After Tick {}", tick);
-        carts.iter().for_each(|c| println!("{:?}", c.to_string(&track_rows)));
-        tick += 1;
-    }
-    print_world(&track_rows, &carts);
+            }
+        });
 }
 
 fn to_string(track: Track) -> String {
