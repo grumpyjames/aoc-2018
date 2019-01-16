@@ -7,6 +7,34 @@ authors = ["James Byatt <grumpyjames@gmail.com>"]
 regex = "1"
 
 [[bin]]
+name = "one-one"
+path = "src/one-one.rs"
+
+[[bin]]
+name = "one-two"
+path = "src/one-two.rs"
+
+[[bin]]
+name = "two-one"
+path = "src/two-one.rs"
+
+[[bin]]
+name = "two-two"
+path = "src/two-two.rs"
+
+[[bin]]
+name = "three-one"
+path = "src/three-one.rs"
+
+[[bin]]
+name = "four-one"
+path = "src/four-one.rs"
+
+[[bin]]
+name = "five-one"
+path = "src/five-one.rs"
+
+[[bin]]
 name = "six"
 path = "src/six.rs"
 
