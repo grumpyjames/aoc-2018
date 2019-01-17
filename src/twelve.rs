@@ -24,17 +24,11 @@ fn to_bit_array(key: &str) -> [bool; 5] {
     [x[0] == '#' as u8, x[1] == '#' as u8, x[2] == '#' as u8, x[3] == '#' as u8, x[4] == '#' as u8]
 }
 
-fn to_bit_state(state: &str) -> VecDeque<bool> {
-    let mut result = VecDeque::with_capacity(state.len());
-
-    state
-        .as_bytes()
-        .iter()
-        .for_each(|b| {
-            result.push_back(*b == '#' as u8);
-        });
-
-    result
+fn to_bit_state(state: String) -> VecDeque<bool> {
+    state.into_bytes()
+        .into_iter()
+        .map(|b| { b == '#' as u8})
+        .collect()
 }
 
 impl Debug for Window
@@ -54,6 +48,15 @@ pub struct Window
     pieces: [bool; 5],
     write_index: usize,
     read_index: usize
+}
+
+pub struct GrowOp
+{
+    body: VecDeque<bool>,
+    prefix: VecDeque<bool>,
+    suffix: VecDeque<bool>,
+    new_front_pot: bool,
+    new_back_pots: isize
 }
 
 impl Window {
@@ -207,7 +210,7 @@ fn main() {
     evolute.insert(to_bit_array(".#.#."), false);
     evolute.insert(to_bit_array("...#."), false);
 
-    let mut state = to_bit_state(&initial_state);
+    let mut state = to_bit_state(initial_state);
     let mut new_front = VecDeque::new();
     let mut new_back = VecDeque::new();
     let mut window = Window {
@@ -223,17 +226,26 @@ fn main() {
 ..#...#....#.....#..#..#..#..
 
     */
-    print(&mut state);
+    print(&state);
     let mut zeroth_pot_index : i32 = 0;
+
+    let mut g = GrowOp{
+        body: state,
+        prefix: new_front,
+        suffix: new_back,
+        new_front_pot: false,
+        new_back_pots: 0
+    };
+
     for h in 0..250 {
         window.reset();
-        let mut new_front_pot = false;
-        let mut new_back_pots = 0;
+        g.new_front_pot = false;
+        g.new_back_pots = 0;
 
-        for i in 0..state.len() + 4 {
+        for i in 0..g.body.len() + 4 {
             let pot_index = (i as i32) - 2;
-            if i < state.len() {
-                window.shove(state[i]);
+            if i < g.body.len() {
+                window.shove(g.body[i]);
             } else {
                 window.shove(false);
             }
@@ -242,47 +254,48 @@ fn main() {
             let new_val = *evolute.get(&key).unwrap_or(&false);
             //println!("{} {} {} {}", key_to_string(&key), new_val, i, pot_index);
 
-            if pot_index < 0 {
-                if new_front_pot || new_val {
-                    new_front.push_back(new_val);
-                    new_front_pot = true;
-                }
-            }
-            else if pot_index >= state.len() as i32
-            {
-                new_back.push_back(new_val);
-                if new_val {
-                    new_back_pots += 1;
-                }
-            }
-            else
-            {
-                state[pot_index as usize] = new_val;
-            }
+            put_pot(&mut g, pot_index, new_val)
         }
 
-        zeroth_pot_index -= new_front.len() as i32;
-        while !new_front.is_empty() {
-            state.push_front(new_front.pop_back().unwrap());
+        zeroth_pot_index -= g.prefix.len() as i32;
+        while !g.prefix.is_empty() {
+            g.body.push_front(g.prefix.pop_back().unwrap());
         }
         //print(&new_back);
 
-        while new_back_pots != 0 {
-            let plant = new_back.pop_front().unwrap();
-            state.push_back(plant);
+        while g.new_back_pots != 0 {
+            let plant = g.suffix.pop_front().unwrap();
+            g.body.push_back(plant);
             if plant {
-                new_back_pots -= 1;
+                g.new_back_pots -= 1;
             }
         }
-        new_back.clear();
+        g.suffix.clear();
 
-        while !state[0] && zeroth_pot_index != 0 {
-            state.pop_front();
+        while !g.body[0] && zeroth_pot_index != 0 {
+            g.body.pop_front();
             zeroth_pot_index += 1;
         }
 
-        print(&mut state);
-        print_total(&state, zeroth_pot_index, h);
+        print(&g.body);
+        print_total(&g.body, zeroth_pot_index, h);
+    }
+}
+
+fn put_pot(state: &mut GrowOp, pot_index: i32, new_val: bool) -> () {
+    if pot_index < 0 {
+        if state.new_front_pot || new_val {
+            state.prefix.push_back(new_val);
+            state.new_front_pot = true;
+        }
+    } else if pot_index >= state.body.len() as i32
+        {
+            state.suffix.push_back(new_val);
+            if new_val {
+                state.new_back_pots += 1;
+            }
+        } else {
+        state.body[pot_index as usize] = new_val;
     }
 }
 
