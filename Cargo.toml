@@ -5,6 +5,9 @@ authors = ["James Byatt <grumpyjames@gmail.com>"]
 
 [dependencies]
 regex = "1"
+nom = "^4.1"
+chrono = "0.4"
+
 
 [[bin]]
 name = "one-one"
