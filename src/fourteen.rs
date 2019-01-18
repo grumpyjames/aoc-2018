@@ -28,7 +28,7 @@ fn main() {
     run_until_found(recipes.clone(), 147061);
 }
 
-fn run_recipe_simulator(initial: Vec<usize>, recipes_to_make: usize) -> () {
+fn run_recipe_simulator(initial: Vec<usize>, recipes_to_make: usize) {
     let mut recipes = initial;
     let mut elf_one_index = 0;
     let mut elf_two_index = 1;
@@ -50,7 +50,7 @@ fn run_recipe_simulator(initial: Vec<usize>, recipes_to_make: usize) -> () {
     println!();
 }
 
-fn run_until_found(initial: Vec<usize>, recipes_to_make: usize) -> () {
+fn run_until_found(initial: Vec<usize>, recipes_to_make: usize) {
     let mut recipes = initial;
     let mut elf_one_index = 0;
     let mut elf_two_index = 1;
@@ -77,7 +77,7 @@ fn run_until_found(initial: Vec<usize>, recipes_to_make: usize) -> () {
     println!("{}", recipes.len() - target_digits.len());
 }
 
-fn append_new_recipes(recipes: &mut Vec<usize>, elf_one_index: usize, elf_two_index: usize) -> () {
+fn append_new_recipes(recipes: &mut Vec<usize>, elf_one_index: usize, elf_two_index: usize) {
     let recipe_one = recipes[elf_one_index];
     let recipe_two = recipes[elf_two_index];
     let new_recipe_total = recipe_one + recipe_two;
