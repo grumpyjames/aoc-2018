@@ -60,7 +60,7 @@ named!(timed_entry <TimedEntry>, do_parse!(
     time: isoish_time >> tag!(" ") >> ent: entry >> (TimedEntry { time: time, entry: ent })
 ));
 
-fn parse_entry(line: &String) -> TimedEntry
+fn parse_entry(line: &str) -> TimedEntry
 {
     let result = timed_entry(line.as_bytes());
     result.unwrap().1
@@ -82,7 +82,7 @@ struct Guard
 
 fn inc_mins(start: DateTime<Utc>, end: DateTime<Utc>, out: &mut HashMap<u32, u64>)
 {
-    let mut it = start.clone();
+    let mut it = start;
     while it != end
     {
         let e = out.entry(it.minute()).or_insert(0);
@@ -99,7 +99,7 @@ struct Winner {
     guard_id: u32
 }
 
-fn compute_score(guard_id: &u32, sleep: &HashMap<u32, u64>) -> Winner
+fn compute_score(guard_id: u32, sleep: &HashMap<u32, u64>) -> Winner
 {
     let mut max_minute = 0;
     let mut max_asleep = 0;
@@ -112,7 +112,7 @@ fn compute_score(guard_id: &u32, sleep: &HashMap<u32, u64>) -> Winner
         total += *v;
     });
 
-    return Winner { total, max_minute, max_asleep, guard_id: *guard_id };
+    Winner { total, max_minute, max_asleep, guard_id }
 }
 
 fn main() {
@@ -129,15 +129,15 @@ fn main() {
     rs.iter().for_each(|r| {
         a = match (a, r.entry) {
             (Option::None, Entry::BeginShift(id)) => {
-                Option::Some(Guard { id: id, state: GuardState::Awake })
+                Option::Some(Guard { id, state: GuardState::Awake })
             },
             (Option::Some(g), Entry::BeginShift(id)) => {
                 match g.state {
                     GuardState::Awake => {
-                        Option::Some(Guard { id: id, state: GuardState::Awake })
+                        Option::Some(Guard { id, state: GuardState::Awake })
                     }
                     GuardState::Asleep(dt) => {
-                        inc_mins(dt, r.time, result.entry(g.id).or_insert(HashMap::new()));
+                        inc_mins(dt, r.time, result.entry(g.id).or_insert_with(HashMap::new));
                         Option::Some(Guard { id: g.id, state: GuardState::Awake })
                     }
                 }
@@ -148,7 +148,7 @@ fn main() {
             (Option::Some(g), Entry::Awake) => {
                 match g.state {
                     GuardState::Asleep(dt) => {
-                        inc_mins(dt, r.time, result.entry(g.id).or_insert(HashMap::new()));
+                        inc_mins(dt, r.time, result.entry(g.id).or_insert_with(HashMap::new));
                         Option::Some( Guard { id: g.id, state: GuardState::Awake })
                     }
                     _ => a
@@ -159,7 +159,7 @@ fn main() {
     });
 
     let win = result.iter().fold(Option::None, | a : Option<Winner>, (k, v) | {
-        let w = compute_score(k, v);
+        let w = compute_score(*k, v);
         match a {
             Option::Some(a) => {
                 if w.total > a.total {
@@ -173,7 +173,7 @@ fn main() {
     });
 
     let win2 = result.iter().fold(Option::None, | a : Option<Winner>, (k, v) | {
-        let w = compute_score(k, v);
+        let w = compute_score(*k, v);
         match a {
             Option::Some(a) => {
                 if w.max_asleep > a.max_asleep {
