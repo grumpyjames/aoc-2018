@@ -219,7 +219,7 @@ fn main() {
     while carts.len() - removed.len() > 1 {
         tick(&track_rows, &mut carts, &mut removed);
     }
-    tick(&track_rows, &mut carts, &mut removed);
+    //tick(&track_rows, &mut carts, &mut removed);
     print_world(&track_rows, &carts);
 
     for c in carts {
@@ -236,11 +236,14 @@ fn tick(
 
     let mut positions = HashMap::new();
     carts.iter().for_each(|c| {
-        positions
-            .entry((c.x, c.y))
-            .or_insert(HashSet::new())
-            .insert(c.cart_id);
+        if !removed.contains(&c.cart_id) {
+            positions
+                .entry((c.x, c.y))
+                .or_insert(HashSet::new())
+                .insert(c.cart_id);
+        }
     });
+
     carts.sort_by(|c1, c2| (c1.y, c1.x).cmp(&(c2.y, c2.x)));
     carts
         .iter_mut()
@@ -252,25 +255,22 @@ fn tick(
 
                 c.tick(&track_rows);
                 {
-                    let option =
-                        positions.get_mut(&(c.x, c.y));
-                    match option
-                        {
-                            Some(a) => {
-                                if a.len() != 0 {
-                                    println!("crash at {},{}", c.x, c.y);
-                                    crashed = true;
-                                    a
-                                        .iter()
-                                        .for_each(|id| {
-                                            removed.insert(*id);
-                                        });
-                                    a.clear();
-                                    removed.insert(c.cart_id);
-                                }
-                            },
-                            _ => {}
-                        }
+                    let mut option = positions.get_mut(&(c.x, c.y));
+                    match option {
+                        Some(ref mut a) => {
+                            if a.len() != 0 {
+                                crashed = true;
+                                a
+                                    .iter()
+                                    .for_each(|id| {
+                                        removed.insert(*id);
+                                    });
+                                a.clear();
+                                removed.insert(c.cart_id);
+                            }
+                        },
+                        _ => {}
+                    }
                 }
 
                 if !crashed
